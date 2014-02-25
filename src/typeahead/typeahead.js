@@ -21,7 +21,7 @@ var Typeahead = (function() {
     }
 
     this.autoselect = !!o.autoselect;
-    this.minLength = _.isNumber(o.minLength) ? o.minLength : 1;
+    this.minLength = o.minLength;
     this.$node = buildDomStructure(o.input, o.withHint);
 
     $menu = this.$node.find('.tt-dropdown-menu');
@@ -111,11 +111,20 @@ var Typeahead = (function() {
     },
 
     _onFocused: function onFocused() {
+      var query;
       this.dropdown.empty();
+      if (this.minLength === 0) {
+        query = this.input.getQuery();
+        this.input.clearHint();
+        this.input.hidePlaceholder();
+        this.dropdown.update(query);
+        this._setLanguageDirection();
+      }
       this.dropdown.open();
     },
 
     _onBlurred: function onBlurred() {
+      this.input.showPlaceholder();
       this.dropdown.close();
     },
 
