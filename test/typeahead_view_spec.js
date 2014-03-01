@@ -83,15 +83,23 @@ describe('Typeahead', function() {
       expect(this.input.resetInputValue).toHaveBeenCalled();
     });
 
-    it('should update the hint', function() {
+    describe('if there is a top suggestion', function() {
       this.dropdown.getDatumForTopSuggestion.andReturn(testDatum);
       this.dropdown.isVisible.andReturn(true);
       this.input.hasOverflow.andReturn(false);
       this.input.getInputValue.andReturn(testDatum.value.slice(0, 2));
 
-      this.dropdown.trigger('cursorRemoved');
+      it('should update the hint', function() {
+        this.dropdown.trigger('cursorRemoved');
 
-      expect(this.input.setHintValue).toHaveBeenCalledWith(testDatum.value);
+        expect(this.input.setHintValue).toHaveBeenCalledWith(testDatum.value);
+      });
+
+      it('should hide the placeholder', function() {
+        this.input.trigger('cursorRemoved');
+
+        expect(this.input.hidePlaceholder).toHaveBeenCalled();
+      });
     });
   });
 
@@ -110,20 +118,29 @@ describe('Typeahead', function() {
 
       runs(function() {
         expect(this.input.setHintValue).toHaveBeenCalledWith(testDatum.value);
+        expect(this.input.hidePlaceholder).toHaveBeenCalled();
       });
     });
   });
 
   describe('when dropdown triggers opened', function() {
-    it('should update the hint', function() {
+    describe('if there is a suggestion', function() {
       this.dropdown.getDatumForTopSuggestion.andReturn(testDatum);
       this.dropdown.isVisible.andReturn(true);
       this.input.hasOverflow.andReturn(false);
       this.input.getInputValue.andReturn(testDatum.value.slice(0, 2));
 
-      this.dropdown.trigger('opened');
+      it('should update the hint', function() {
+        this.dropdown.trigger('opened');
 
-      expect(this.input.setHintValue).toHaveBeenCalledWith(testDatum.value);
+        expect(this.input.setHintValue).toHaveBeenCalledWith(testDatum.value);
+      });
+
+      it('should hide the placeholder', function() {
+        this.dropdown.trigger('opened');
+
+        expect(this.input.hidePlaceholder).toHaveBeenCalled();
+      });
     });
 
     it('should trigger typeahead:opened', function() {
@@ -193,12 +210,6 @@ describe('Typeahead', function() {
         expect(this.view.dir).toBe('rtl');
         expect(this.view.$node).toHaveCss({ direction: 'rtl' });
         expect(this.dropdown.setLanguageDirection).toHaveBeenCalledWith('rtl');
-      });
-
-      it('should hide the placeholder text', function() {
-        this.input.trigger('focused');
-
-        expect(this.input.hidePlaceholder).toHaveBeenCalled();
       });
     });
   });
@@ -411,6 +422,12 @@ describe('Typeahead', function() {
       expect(this.input.clearHint).toHaveBeenCalled();
     });
 
+    it('should show the placeholder text', function() {
+      this.input.trigger('queryChanged', testDatum.value);
+
+      expect(this.input.showPlaceholder).toHaveBeenCalled();
+    });
+
     it('should empty dropdown', function() {
       this.input.trigger('queryChanged', testDatum.value);
 
@@ -456,6 +473,12 @@ describe('Typeahead', function() {
       this.input.trigger('whitespaceChanged');
 
       expect(this.dropdown.open).toHaveBeenCalled();
+    });
+
+    it('should hide the placeholder', function() {
+      this.input.trigger('whitespacechanged');
+
+      expect(this.input.hidePlaceholder).toHaveBeenCalled();
     });
   });
 
